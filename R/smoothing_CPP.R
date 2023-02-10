@@ -515,7 +515,7 @@ CPP_get_evaluations_points = function(mesh, order)
   #Returning the evaluation matrix
   points
 }
-
+#'@export
 CPP_get.FEM.Mass.Matrix<-function(FEMbasis)
 {
   if(is(FEMbasis$mesh, "mesh.2D")){
@@ -580,7 +580,7 @@ CPP_get.FEM.Mass.Matrix<-function(FEMbasis)
   A = sparseMatrix(i = triplets[[1]][,1], j=triplets[[1]][,2], x = triplets[[2]], dims = c(nrow(FEMbasis$mesh$nodes),nrow(FEMbasis$mesh$nodes)))
   return(A)
 }
-
+#'@export
 CPP_get.FEM.Stiff.Matrix<-function(FEMbasis)
 {
   if(is(FEMbasis$mesh, "mesh.2D")){
