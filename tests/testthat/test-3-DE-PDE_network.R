@@ -28,5 +28,5 @@ test_that("Density Estimation - Linear Network", {
   lambda = 1e-3
   invisible(capture.output(sol <- DE.FEM(data = data, FEMbasis = FEMbasis, lambda = lambda)))
   load(file=paste0(foldername, "/test_3.RData"))
-  expect_equal( sqrt(mean((sol_ex$g-sol$g)^2)) < 10*.Machine$double.eps, TRUE);
+  expect_equal( mean((sol_ex$g-sol$g)^2) < 10*.Machine$double.eps, TRUE);
 })

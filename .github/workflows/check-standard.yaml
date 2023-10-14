@@ -39,11 +39,14 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
       
-      - name: Add RGL_USE_NULL = T for later steps
-        run: |
-          Sys.setenv(RGL_USE_NULL = TRUE)
-        shell: Rscript {0}
-     
+      - name: installing rgl support
+        
+        if: ${{runner.os}} == 'ubuntu-latest'
+          run: apt-get install libgl1-mesa-dev libglu1-mesa-dev
+        
+        if: ${{runner.os}} == 'macos-latest' 
+          run: brew install xquartz
+        
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
