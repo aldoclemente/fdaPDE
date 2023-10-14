@@ -1,5 +1,4 @@
 ^LICENSE.md
 ^.*\.Rproj$
 ^\.Rproj\.user$
-test/*
 ^\.github$
