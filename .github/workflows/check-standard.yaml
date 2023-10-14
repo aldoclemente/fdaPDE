@@ -42,11 +42,15 @@ jobs:
       - name: installing rgl support
         
         if: ${{runner.os}} == 'ubuntu-latest'
-          run: apt-get install libgl1-mesa-dev libglu1-mesa-dev
-        
+          run: |
+            apt-get install libgl1-mesa-dev libglu1-mesa-dev
+          shell: bash
+          
         if: ${{runner.os}} == 'macos-latest' 
-          run: brew install xquartz
-        
+          run:|
+            brew install xquartz
+          shell: bash
+          
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
