@@ -39,17 +39,15 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
       
-      - name: installing rgl support
-        
-        if: ${{runner.os}} == 'ubuntu-latest'
-          run: |
+      - if: ${{runner.os}} == 'ubuntu-latest'
+        run: |
             apt-get install libgl1-mesa-dev libglu1-mesa-dev
-          shell: bash
-          
-        if: ${{runner.os}} == 'macos-latest' 
-          run:|
+        shell: bash
+           
+      - if: ${{runner.os}} == 'macos-latest' 
+        run: |
             brew install xquartz
-          shell: bash
+        shell: bash
           
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
