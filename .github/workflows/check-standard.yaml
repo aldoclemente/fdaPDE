@@ -40,15 +40,15 @@ jobs:
           use-public-rspm: true
       
       - name: installing rgl support 
-        - if: runner.os == 'Linux'
-          run: |
-            sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
-          shell: bash
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
+        shell: bash
            
-        - if: runner.os == 'macOS' 
-          run: |
-              brew install xquartz
-          shell: bash
+        if: runner.os == 'macOS' 
+        run: |
+            brew install xquartz
+        shell: bash
           
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
