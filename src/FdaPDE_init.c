@@ -19,6 +19,7 @@ extern SEXP get_FEM_mass_matrix(SEXP, SEXP, SEXP, SEXP);
 extern SEXP get_FEM_PDE_matrix( SEXP,SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP get_FEM_PDE_space_varying_matrix( SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP get_FEM_stiff_matrix(SEXP, SEXP, SEXP, SEXP);
+extern SEXP get_psi_matrix(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP get_integration_points(SEXP, SEXP, SEXP, SEXP);
 extern SEXP points_projection(SEXP, SEXP, SEXP, SEXP);
 extern SEXP points_search(SEXP, SEXP, SEXP, SEXP);
@@ -61,6 +62,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"get_FEM_PDE_matrix",                (DL_FUNC) &get_FEM_PDE_matrix,                16},
     {"get_FEM_PDE_space_varying_matrix",  (DL_FUNC) &get_FEM_PDE_space_varying_matrix,  17},
     {"get_FEM_stiff_matrix",              (DL_FUNC) &get_FEM_stiff_matrix,               4},
+    {"get_psi_matrix",                    (DL_FUNC) &get_psi_matrix,                     5},
     {"get_integration_points",            (DL_FUNC) &get_integration_points,             4},
     {"points_projection",                 (DL_FUNC) &points_projection,                  4},
     {"points_search",                     (DL_FUNC) &points_search,                      4},
