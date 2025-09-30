@@ -77,6 +77,8 @@ SEXP get_psi_matrix_skeleton(SEXP Rmesh, SEXP Rlocations){
     Element<EL_NNODES,mydim,ndim> current_element;
     Point<ndim> current_point;
     SpMat psi_ = SpMat(nlocs, nnodes);
+    std::vector<Eigen::Triplet<Real>> triplets;
+    triplets.reserve(EL_NNODES * mesh.num_elements());
     
     for (UInt i = 0; i < nlocs; ++i) {
         std::array<Real, ndim> coords;
@@ -89,9 +91,11 @@ SEXP get_psi_matrix_skeleton(SEXP Rmesh, SEXP Rlocations){
         
         for (int j=0; j < EL_NNODES; ++j) {
             Real value = current_element.evaluate_point(current_point, Eigen::Matrix<Real,EL_NNODES,1>::Unit(j));
-            psi_.insert(i, current_element[j].getId()) =  value;
+            triplets.emplace_back(i, current_element[j].getId(), value);
+            //psi_.insert(i, current_element[j].getId()) =  value;
          }
     }//end of for loop
+    psi_.setFromTriplets(triplets.begin(),triplets.end());
     
     SEXP result;
 	result = PROTECT(Rf_allocVector(VECSXP, 2));
