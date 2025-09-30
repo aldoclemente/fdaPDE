@@ -64,4 +64,57 @@ SEXP get_FEM_Matrix_skeleton(SEXP Rmesh, EOExpr<A> oper)
 	return(result);
 }
 
+template<UInt ORDER, UInt mydim, UInt ndim>
+SEXP get_psi_matrix_skeleton(SEXP Rmesh, SEXP Rlocations){
+    
+    using meshElement = typename MeshHandler<ORDER, mydim, ndim>::meshElement;
+    MeshHandler<ORDER, mydim, ndim> mesh(Rmesh);
+    RNumericMatrix locations(Rlocations);
+        
+    UInt nlocs = locations.nrows();
+    constexpr UInt EL_NNODES = how_many_nodes(ORDER,mydim);
+    UInt nnodes = mesh.num_nodes();	
+    Element<EL_NNODES,mydim,ndim> current_element;
+    Point<ndim> current_point;
+    SpMat psi_ = SpMat(nlocs, nnodes);
+    std::vector<Eigen::Triplet<Real>> triplets;
+    triplets.reserve(EL_NNODES * mesh.num_elements());
+    
+    for (UInt i = 0; i < nlocs; ++i) {
+        std::array<Real, ndim> coords;
+        for(UInt n=0; n<ndim; ++n) coords[n] = locations(i,n);
+
+        current_point = Point<ndim>(coords);
+        current_element = mesh.findLocationNaive(current_point);
+        
+        if(current_element.getId() == Identifier::NVAL) continue;
+        
+        for (int j=0; j < EL_NNODES; ++j) {
+            Real value = current_element.evaluate_point(current_point, Eigen::Matrix<Real,EL_NNODES,1>::Unit(j));
+            triplets.emplace_back(i, current_element[j].getId(), value);
+            //psi_.insert(i, current_element[j].getId()) =  value;
+         }
+    }//end of for loop
+    psi_.setFromTriplets(triplets.begin(),triplets.end());
+    
+    SEXP result;
+	result = PROTECT(Rf_allocVector(VECSXP, 2));
+	SET_VECTOR_ELT(result, 0, Rf_allocMatrix(INTSXP, psi_.nonZeros() , 2));
+	SET_VECTOR_ELT(result, 1, Rf_allocVector(REALSXP, psi_.nonZeros()));
+
+    int *rans = INTEGER(VECTOR_ELT(result, 0));
+	Real  *rans2 = REAL(VECTOR_ELT(result, 1));
+	UInt i = 0;
+	for (UInt k=0; k < psi_.outerSize(); ++k){
+	    for (SpMat::InnerIterator it(psi_,k); it; ++it){
+				rans[i] = 1+it.row();
+				rans[i + psi_.nonZeros()] = 1+it.col();
+				rans2[i] = it.value();
+				i++;
+		}
+	}
+	UNPROTECT(1);
+	return(result);
+}
+
 #endif

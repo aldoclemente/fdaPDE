@@ -809,3 +809,71 @@ CPP_get.FEM.PDE.sv.Matrix<-function(observations, FEMbasis, PDE_parameters)
   A = sparseMatrix(i = triplets[[1]][,1], j=triplets[[1]][,2], x = triplets[[2]], dims = c(nrow(FEMbasis$mesh$nodes),nrow(FEMbasis$mesh$nodes)))
   return(A)
 }
+
+CPP_get.psi.Matrix<-function(FEMbasis, locations)
+{
+  if(is(FEMbasis$mesh, "mesh.2D")){
+    ndim = 2
+    mydim = 2
+  }else if(is(FEMbasis$mesh, "mesh.1.5D")){
+    ndim = 2
+    mydim = 1
+  }else if(is(FEMbasis$mesh, "mesh.2.5D")){
+    ndim = 3
+    mydim = 2
+  }else if(is(FEMbasis$mesh, "mesh.3D")){
+    ndim = 3
+    mydim = 3
+  }else{
+    stop('Unknown mesh class')
+  }
+
+  ## Set propr type for correct C++ reading
+   if( (ndim==2 && mydim==2) || (ndim==3 && mydim==2) ){
+   # Indexes in C++ starts from 0, in R from 1, opporGCV.inflation.factor transformation
+
+   FEMbasis$mesh$triangles = FEMbasis$mesh$triangles - 1
+   FEMbasis$mesh$edges = FEMbasis$mesh$edges - 1
+   FEMbasis$mesh$neighbors[FEMbasis$mesh$neighbors != -1] = FEMbasis$mesh$neighbors[FEMbasis$mesh$neighbors != -1] - 1
+
+   ## Set propr type for correct C++ reading
+   storage.mode(FEMbasis$mesh$triangles) <- "integer"
+   storage.mode(FEMbasis$mesh$edges) <- "integer"
+   storage.mode(FEMbasis$mesh$neighbors) <- "integer"
+   
+  }else if( ndim==2 && mydim==1){
+   # Indexes in C++ starts from 0, in R from 1, opporGCV.inflation.factor transformation
+   FEMbasis$mesh$edges = FEMbasis$mesh$edges - 1
+    
+   ## Set propr type for correct C++ reading
+   storage.mode(FEMbasis$mesh$edges) <- "integer"
+   
+  }else if( ndim==3 && mydim==3){
+   # Indexes in C++ starts from 0, in R from 1, opporGCV.inflation.factor transformation
+   FEMbasis$mesh$tetrahedrons = FEMbasis$mesh$tetrahedrons - 1
+   FEMbasis$mesh$faces = FEMbasis$mesh$faces - 1
+   FEMbasis$mesh$neighbors[FEMbasis$mesh$neighbors != -1] = FEMbasis$mesh$neighbors[FEMbasis$mesh$neighbors != -1] - 1
+   
+   ## Set propr type for correct C++ reading
+   storage.mode(FEMbasis$mesh$faces) <- "integer"
+   storage.mode(FEMbasis$mesh$neighbors) <- "integer"
+   storage.mode(FEMbasis$mesh$tetrahedrons) <- "integer"
+  }
+  
+  storage.mode(FEMbasis$mesh$nodes) <- "double"
+  storage.mode(FEMbasis$order) <- "integer"
+  storage.mode(ndim)<-"integer"
+  storage.mode(mydim)<-"integer"
+
+  storage.mode(locations) <- "double"
+  
+  ## Call C++ function
+  triplets <- .Call("get_psi_matrix", FEMbasis$mesh,
+                    FEMbasis$order,mydim, ndim, locations,
+                    PACKAGE = "fdaPDE")
+
+  A = sparseMatrix(i = triplets[[1]][,1], j=triplets[[1]][,2], x = triplets[[2]], 
+                    dims = c(nrow(locations),nrow(FEMbasis$mesh$nodes)))
+  return(A)
+}
+
